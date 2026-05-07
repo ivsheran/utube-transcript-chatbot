@@ -57,7 +57,12 @@ def create_transcript_docx(transcript_text: str, video_url: str) -> io.BytesIO:
     doc.add_heading("YouTube Video Transcript", level=1)
     doc.add_paragraph(f"Source: {video_url}")
     doc.add_paragraph("")
-    doc.add_paragraph(transcript_text)
+
+    # Each line as a separate paragraph
+    for line in transcript_text.split("\n"):
+        line = line.strip()
+        if line:
+            doc.add_paragraph(line)
 
     buffer = io.BytesIO()
     doc.save(buffer)

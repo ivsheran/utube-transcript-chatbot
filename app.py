@@ -8,8 +8,10 @@ from chatbot import (
     create_summary_chain,
     create_qa_prompt,
     create_qa_chain,
-    generate_answer
+    generate_answer,
+    get_full_transcript
 )
+from drive import save_transcript_to_drive
 from config import AVAILABLE_MODELS, DEFAULT_MODEL, OLLAMA_BASE_URL
 
 # --- Global state ---
@@ -18,6 +20,7 @@ qa_chain = None
 summary_chain = None
 chat_history = []
 video_duration = None
+current_url = None
 
 def ash_says(text):
     return f"🐾 **Ash:** {text}"
@@ -25,7 +28,7 @@ def ash_says(text):
 ASH_GREETING = ash_says("Hi! I'm Ash 🐾 Load a YouTube video above and I'll answer any questions about it!")
 
 def load_video(url, model_name):
-    global faiss_index, qa_chain, summary_chain, chat_history, video_duration
+    global faiss_index, qa_chain, summary_chain, chat_history, video_duration, current_url
 
     if not url.strip():
         return "⚠️ Please insert a YouTube link.", [{"role": "assistant", "content": ASH_GREETING}]
@@ -42,6 +45,7 @@ def load_video(url, model_name):
         summary_chain = create_summary_chain(llm, create_summary_prompt())
 
         chat_history = []
+        current_url = url
 
         return "✅ Video loaded! Ask Ash anything about it.", [{"role": "assistant", "content": ASH_GREETING}]
 
@@ -92,6 +96,16 @@ def new_video():
     video_duration = None
     return "", "🔄 Ready for a new video.", [{"role": "assistant", "content": ASH_GREETING}], ""
 
+def save_transcript():
+    global current_url
+    if current_url is None:
+        return "⚠️ Please load a YouTube video first."
+    try:
+        transcript_text = get_full_transcript(current_url)
+        link = save_transcript_to_drive(transcript_text, current_url)
+        return f"✅ Transcript saved to Google Drive: {link}"
+    except Exception as e:
+        return f"❌ Error: {str(e)}"
 
 # --- Gradio UI ---
 with gr.Blocks(title="YouTube Chatbot") as demo:
@@ -113,6 +127,9 @@ with gr.Blocks(title="YouTube Chatbot") as demo:
 
     load_btn = gr.Button("Load Video", variant="primary")
     status = gr.Textbox(label="Status", interactive=False)
+
+    save_btn = gr.Button("💾 Save Transcript to Drive")
+    drive_status = gr.Textbox(label="Drive Status", interactive=False)
 
     chatbot = gr.Chatbot(
         label="Ash 🐾",
@@ -154,6 +171,12 @@ with gr.Blocks(title="YouTube Chatbot") as demo:
         new_video,
         outputs=[url_input, status, chatbot, question_input]
     )
+
+    save_btn.click(
+        save_transcript,
+        inputs=[],
+        outputs=drive_status
+        )
 
 if __name__ == "__main__":
     demo.launch(share=True)

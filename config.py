@@ -3,7 +3,7 @@
 SERVICE_ACCOUNT_FILE = "credentials/service_account.json"
 
 # --- Google Drive folder ---
-DRIVE_FOLDER_ID = "12K6TByD5Jbm3hpXSVxE_JYt22mhLH5W2d"
+DRIVE_FOLDER_ID = "12K6TByD5Jbm3hpXSVxE_JYt22mhLH5W2"
 
 # --- Models ---
 AVAILABLE_MODELS = ["llama3.1:8b", "mistral:7b"]

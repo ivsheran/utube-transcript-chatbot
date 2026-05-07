@@ -213,6 +213,16 @@ def generate_answer(question, faiss_index, qa_chain, chat_history, video_duratio
 
     return response
 
-
+def get_full_transcript(url: str) -> str:
+    """
+    Get the full formatted transcript with timestamps for a YouTube video.
+    
+    :param url: YouTube video URL
+    :return: Formatted transcript text with timestamps
+    """
+    transcript = get_transcript(url)
+    if transcript is None:
+        raise ValueError("No English transcript found for this video.")
+    return process(transcript)
 
 

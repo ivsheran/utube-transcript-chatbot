@@ -25,7 +25,7 @@ current_url = None
 def ash_says(text):
     return f"🐾 **Ash:** {text}"
 
-ASH_GREETING = ash_says("Hi! I'm Ash 🐾 Load a YouTube video above and I'll answer any questions about it!")
+ASH_GREETING = ash_says("Hi! I'm Ash 🐾 Load a video and I'll answer any questions about it!")
 
 def load_video(url, model_name):
     global faiss_index, qa_chain, summary_chain, chat_history, video_duration, current_url
@@ -110,7 +110,7 @@ def save_transcript():
 # --- Gradio UI ---
 with gr.Blocks(title="YouTube Chatbot") as demo:
     gr.Markdown("# 🎬 YouTube Chatbot")
-    gr.Markdown("This is a YouTube Chatbot. It provides a summary of any video on YouTube.")
+    gr.Markdown("Transcribes, summarises and answers questions about any YouTube video.")
 
     with gr.Row():
         url_input = gr.Textbox(
